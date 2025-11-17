@@ -1,11 +1,24 @@
-<div align="center">
+# Soft Emotional Button
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+A React application showcasing a "Soft Emotional Button" component. This button implements the "State Layer" principle from the design system, creating a fluid, tactile ripple effect that responds directly to user interaction.
 
-  <h1>Built with AI Studio</h2>
+The project demonstrates a modular architecture with a clear separation of concerns: a central theme file for design tokens, a reusable core button component, and a main app file for presentation.
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+This project is built with React, Framer Motion, and follows a strict CSS-in-JS and modular dependency approach via an import map.
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## Directory Tree
 
-</div>
+```
+.
+├── App.tsx
+├── components
+│   └── Core
+│       └── Button.tsx
+├── importmap.js
+├── index.html
+├── index.tsx
+├── metadata.json
+├── noteBook.md
+├── README.md
+└── theme.tsx
+```
