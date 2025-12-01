@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import type { CSSProperties, MouseEvent, TouchEvent, ReactNode } from 'react';
 import { motion } from 'framer-motion';
+import { StateLayer } from './StateLayer.tsx';
 
 interface ButtonProps {
     children: ReactNode;
@@ -14,6 +15,8 @@ export const Button: React.FC<ButtonProps> = ({ children, onClick, theme }) => {
     const [size, setSize] = useState({ width: 0, height: 0 });
     const buttonRef = useRef<HTMLButtonElement>(null);
 
+    // --- Interaction Logic (The Brains) ---
+    // We track where the user interacts to tell the StateLayer where to grow from.
     const updateMousePosition = (clientX: number, clientY: number) => {
         if (buttonRef.current) {
             const rect = buttonRef.current.getBoundingClientRect();
@@ -22,7 +25,6 @@ export const Button: React.FC<ButtonProps> = ({ children, onClick, theme }) => {
         }
     };
 
-    // --- Event Handlers ---
     const handleMouseMove = (e: MouseEvent<HTMLButtonElement>) => {
         updateMousePosition(e.clientX, e.clientY);
     };
@@ -47,7 +49,7 @@ export const Button: React.FC<ButtonProps> = ({ children, onClick, theme }) => {
         setIsActive(false);
     };
 
-    // Styles
+    // --- Styles ---
     const buttonStyle: CSSProperties = {
         position: 'relative',
         padding: `${theme.space.xs} ${theme.space.s}`,
@@ -56,7 +58,7 @@ export const Button: React.FC<ButtonProps> = ({ children, onClick, theme }) => {
         border: 'none',
         borderRadius: '9999px',
         cursor: 'pointer',
-        overflow: 'hidden',
+        overflow: 'hidden', // Essential: Clips the StateLayer inside the button shape
         outline: 'none',
         userSelect: 'none',
         WebkitTapHighlightColor: 'transparent',
@@ -66,23 +68,8 @@ export const Button: React.FC<ButtonProps> = ({ children, onClick, theme }) => {
 
     const textStyle: CSSProperties = {
         position: 'relative',
-        zIndex: 2,
+        zIndex: 2, // Keeps text above the StateLayer
         pointerEvents: 'none',
-    };
-    
-    // Calculate the diameter needed to cover the button from any point
-    const maxDiameter = Math.hypot(size.width, size.height) * 2;
-    
-    const stateLayerStyle: CSSProperties = {
-        position: 'absolute',
-        top: mousePosition.y,
-        left: mousePosition.x,
-        backgroundColor: theme.colors['Color/Primary/Content/1'],
-        borderRadius: '50%',
-        transform: 'translate(-50%, -50%)',
-        pointerEvents: 'none',
-        zIndex: 1,
-        opacity: 0.1,
     };
 
     return (
@@ -99,18 +86,18 @@ export const Button: React.FC<ButtonProps> = ({ children, onClick, theme }) => {
             transition={{ type: 'spring', stiffness: 400, damping: 17 }}
         >
             <span style={textStyle}>{children}</span>
-            <motion.div
-                style={stateLayerStyle}
-                animate={{
-                    width: isActive ? maxDiameter : 0,
-                    height: isActive ? maxDiameter : 0,
-                }}
-                transition={{
-                    type: 'spring',
-                    stiffness: 100,
-                    damping: 20,
-                    mass: 1,
-                }}
+            
+            {/* 
+              The isolated StateLayer component. 
+              It handles the visual ripple effect based on the state we pass it.
+            */}
+            <StateLayer 
+                theme={theme}
+                isActive={isActive}
+                x={mousePosition.x}
+                y={mousePosition.y}
+                width={size.width}
+                height={size.height}
             />
         </motion.button>
     );
